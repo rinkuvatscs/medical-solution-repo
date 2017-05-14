@@ -9,18 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aaspaasdoctor.entity.Doctor;
 import com.aaspaasdoctor.service.DoctorServiceImpl;
 
-
 @RestController
 @RequestMapping("/api/doctor")
 public class DoctorController {
 
 	@Autowired
-	DoctorServiceImpl doctorServiceImpl ;
-	
-	
+	DoctorServiceImpl doctorServiceImpl;
+
 	@RequestMapping("/")
-	public List<Doctor> getAllDoctors(){
+	public List<Doctor> getAllDoctors() {
 		return doctorServiceImpl.findAllDoctors();
 	}
-	
+
 }

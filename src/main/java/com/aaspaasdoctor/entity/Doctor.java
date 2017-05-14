@@ -3,11 +3,12 @@ package com.aaspaasdoctor.entity;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.springframework.data.annotation.Id;
-
 @Table(name = "doctor")
+@Entity
 public class Doctor {
 
 	@Id
@@ -16,51 +17,50 @@ public class Doctor {
 
 	private String name;
 	private String mobile;
-    private String adhaar ;
-    private String clinic ;
-    
-    @Column(name = "home_address")
-    private String homeAddress;
-    @Column(name = "highest_degree")
-    private String highestDegree ;
-    
-    private String expertise ;
-    
-    @Column(name ="self_desc")
-    private String selfDescription ;
-    
-    @Column(name ="gov")
-    private Integer isGoverment ; 
-    
-    private Integer fee ;
-    @Column(name ="free_day")
-    private Integer freeDay;
-    
-    private String email;
-    private String gender ;
-    private String state ;
-    
-    @Column(name = "dob")
-    private Date dateOfBrith;
-    
-    private String timing ;
-    
-    @Column(name = "tand_c_accepted")
-    private Integer tandCAccepted ;
-    
-    private Integer verified ;
-    
-    @Column(name = "profile_pic_path")
-    private String profilePicPath ;
-    
-    @Column(name = "created_date")
-    private Date createdDate ;
-    
-    @Column(name = "updated_date")
-    private Date updatedDate ;
-    
-    private String desc ;
+	private String adhaar;
+	private String clinic;
 
+	@Column(name = "home_address")
+	private String homeAddress;
+	@Column(name = "highest_degree")
+	private String highestDegree;
+
+	private String expertise;
+
+	@Column(name = "self_desc")
+	private String selfDescription;
+
+	@Column(name = "gov")
+	private Integer isGoverment;
+
+	private Integer fee;
+	@Column(name = "free_day")
+	private Integer freeDay;
+
+	private String email;
+	private String gender;
+	private String state;
+
+	@Column(name = "dob")
+	private Date dateOfBrith;
+
+	private String timing;
+
+	@Column(name = "tand_c_accepted")
+	private Integer tandCAccepted;
+
+	private Integer verified;
+
+	@Column(name = "profile_pic_path")
+	private String profilePicPath;
+
+	@Column(name = "created_date")
+	private Date createdDate;
+
+	@Column(name = "updated_date")
+	private Date updatedDate;
+
+	private String desc;
 
 	public Integer getdId() {
 		return dId;
@@ -245,8 +245,5 @@ public class Doctor {
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
-    
-    
-    
-    
+
 }
