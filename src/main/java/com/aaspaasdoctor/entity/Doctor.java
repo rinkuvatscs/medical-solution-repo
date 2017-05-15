@@ -17,7 +17,7 @@ public class Doctor {
 
 	private String name;
 	private String mobile;
-	private String adhaar;
+	private String aadhaar;
 	private String clinic;
 
 	@Column(name = "home_address")
@@ -86,12 +86,12 @@ public class Doctor {
 		this.mobile = mobile;
 	}
 
-	public String getAdhaar() {
-		return adhaar;
+	public String getAadhaar() {
+		return aadhaar;
 	}
 
-	public void setAdhaar(String adhaar) {
-		this.adhaar = adhaar;
+	public void setAadhaar(String aadhaar) {
+		this.aadhaar = aadhaar;
 	}
 
 	public String getClinic() {
