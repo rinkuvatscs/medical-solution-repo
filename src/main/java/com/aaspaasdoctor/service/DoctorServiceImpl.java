@@ -1,19 +1,34 @@
 package com.aaspaasdoctor.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.aaspaasdoctor.entity.Doctor;
+import com.aaspaasdoctor.entity.Expertise;
 import com.aaspaasdoctor.exception.BadRequestException;
+import com.aaspaasdoctor.location.response.LocationResponse;
+import com.aaspaasdoctor.location.service.LocationService;
 import com.aaspaasdoctor.repository.DoctorRepository;
+import com.aaspaasdoctor.repository.ExpertiseRepository;
 
 @Service
 public class DoctorServiceImpl {
 
 	@Autowired
 	DoctorRepository doctorRepository;
+
+	@Autowired
+	ExpertiseRepository expertiseRepository;
+
+	@Autowired
+	DoctorUtility doctorUtility;
+
+	@Autowired
+	LocationService locationService;
 
 	private static final String INVALID_DOCTOR_ID = "Doctor's Id is not valid";
 	private static final String INVALID_DOCTOR_AADHAAR = "Doctor's Aadhaar Number is not valid";
@@ -122,46 +137,166 @@ public class DoctorServiceImpl {
 			throw new BadRequestException(INVALID_DOCTOR_MOBILE);
 		}
 	}
-	
-	
-//For Dyanamic
-	/*O
-	public List<Doctor> getDoctors(Doctor doctor) {
-		int rowupdate = 0;
-		if (doctor.getAadhaar() != null) {
-			return getDoctorsByAadhaarNumber(doctor);
-		}
-		if (!StringUtils.isEmpty(doctor.getMobile())) {
-			return getDoctorsByMobile(doctor);
-		}
-		if (!StringUtils.isEmpty(doctor.getdId()) && doctor.getdId() > 0) {
-			return getDoctorsByDoctorId(doctor);
-		}
-		if (!StringUtils.isEmpty(doctor.getEmail())) {
-			return getDoctorsByEmail(doctor);
-		}
-		List<Object> args = new ArrayList<>();
-		StringBuilder query = new StringBuilder(QueryConstants.GET_DOCTORS);
 
+	private void validateDoctor(Doctor doctor) {
+		if (!StringUtils.isEmpty(doctor.getEmail())
+				&& !StringUtils.isEmpty(findDoctorByEmail(doctor.getEmail()))) {
+			throw new BadRequestException("Updated Email ID already registered");
+		}
+		if (!StringUtils.isEmpty(doctor.getAadhaar())
+				&& !StringUtils
+						.isEmpty(findDoctorByAadhaar(doctor.getAadhaar()))) {
+			throw new BadRequestException("Updated Aadhaar already registered");
+		}
+		if (!StringUtils.isEmpty(doctor.getMobile())
+				&& !StringUtils.isEmpty(findDoctorByMobile(doctor.getMobile()))) {
+			throw new BadRequestException(
+					"Updated Mobile Number already registered ");
+		}
+	}
+
+	public String updateDoctor(Doctor doctor) {
+
+		int updateRow = 0;
+		String response;
+		List<Object> args = new ArrayList<>();
+		StringBuilder query = new StringBuilder("UPDATE doctor SET ");
 		if (!StringUtils.isEmpty(doctor)) {
 
-			rowupdate = appendDoctorNameWithLike(rowupdate, doctor, query, args);
-			rowupdate = appendDoctorIsGovernmentServent(rowupdate, doctor,
-					query, args);
-			rowupdate = appendDoctorHomeAddressWithLike(rowupdate, doctor,
-					query, args);
-			rowupdate = appendDoctorExpertiseWithLike(rowupdate, doctor, query,
-					args);
-			rowupdate = appendDoctorOneTimeFee(rowupdate, doctor, query, args);
-			appendDoctorClinicWithLike(rowupdate, doctor, query, args);
+			validateDoctor(doctor);
 
-			return jdbcTemplate.query(query.toString(), new DoctorExtractor(),
-					args.toArray());
+			updateRow = updateRow
+					+ doctorUtility.appendDoctorName(doctor, query, args);
+			updateRow = doctorUtility.appendDoctorHomeAddress(updateRow,
+					doctor, query, args);
+			updateRow = doctorUtility.appendDoctorHighestDegree(updateRow,
+					doctor, query, args);
+			updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorIsGovernmentServent(
+					updateRow, doctor, query, args);
+			updateRow = doctorUtility.appendDoctorOneTimeFee(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorDaysCheckFree(updateRow,
+					doctor, query, args);
+			updateRow = doctorUtility.appendDoctorClinicAddress(updateRow,
+					doctor, query, args);
+			updateRow = doctorUtility.appendDoctorMobile(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorAadhaarNumber(updateRow,
+					doctor, query, args);
+			updateRow = doctorUtility.appendDoctorEmail(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorGender(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorDesc(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorTiming(updateRow, doctor,
+					query, args);
+			updateRow = doctorUtility.appendDoctorProfilePicPath(updateRow,
+					doctor, query, args);
+			doctorUtility.appendDoctorDOB(updateRow, doctor, query, args);
 
+			query.append("  WHERE dId = ? ");
+			args.add(doctor.getdId());
+
+			// int update = jdbcTemplate.update(query.toString(),
+			// args.toArray());
+			int update = 1;
+			if (update > 0) {
+
+				if (updateDoctorAddress(doctor) > 0) {
+					response = "Doctor successfully Updated...!!!";
+				} else {
+					return "Doctor Address Details not added";
+				}
+			} else {
+				response = "There is some problem, please try again later...!!!";
+			}
 		} else {
-			throw new BadRequestException(
-					"PLease provide proper detail for Doctor");
+			response = "Doctor details are Empty, provide some details to update....!!!";
 		}
-	} */
+
+		return response;
+	}
+
+	private int updateDoctorAddress(Doctor doctor) {
+		int updateRow = 0;
+		int tempUpdateRow;
+		boolean updateLocations = false;
+		List<Object> args = new ArrayList<>();
+		StringBuilder query = new StringBuilder("UPDATE doctorAddress SET ");
+		updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
+				query, args);
+		updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
+				query, args);
+		tempUpdateRow = doctorUtility.appendDoctorCity(updateRow, doctor,
+				query, args);
+		if (tempUpdateRow > updateRow) {
+			updateLocations = true;
+			updateRow = tempUpdateRow;
+		}
+		if (!updateLocations) {
+			tempUpdateRow = doctorUtility.appendDoctorPin(updateRow, doctor,
+					query, args);
+			if (tempUpdateRow > updateRow) {
+				updateLocations = true;
+				updateRow = tempUpdateRow;
+			}
+		} else {
+			updateRow = doctorUtility.appendDoctorPin(tempUpdateRow, doctor,
+					query, args);
+		}
+		updateRow = doctorUtility.appendDoctorState(updateRow, doctor, query,
+				args);
+		updateRow = doctorUtility.appendDoctorLandMark(updateRow, doctor,
+				query, args);
+		if (updateRow > 0) {
+			query.append(" , updatedDate = NOW() ");
+		}
+		if (updateLocations) {
+			LocationResponse locationResponse = locationService
+					.getGeoCodeFromAddress(createAddress(doctor));
+			if (locationResponse != null) {
+				doctorUtility.appendDoctorLatitdueAndLogitude(updateRow,
+						locationResponse, query, args);
+			}
+		}
+		query.append("  WHERE dId = ? ");
+		args.add(doctor.getdId());
+		// TODO jdbcTemplate..update(query.toString(), args.toArray());
+		return 0;
+	}
+
+	private String createAddress(Doctor doctor) {
+		return doctor.getClinic() + ", " + doctor.getCity() + " ,"
+				+ doctor.getState() + ", India";
+	}
+
+	public List<Expertise> getAllExpertized() {
+		Integer unApproved = 0;
+		return (List<Expertise>) expertiseRepository.findByApproved(unApproved);
+	}
+	
+	public List<Expertise> getUnApprovedExpertise(){
+		Integer approved = 1;
+		return (List<Expertise>) expertiseRepository.findByApproved(approved);
+
+	}
+
+	public Expertise approveExpertise(Expertise expertise) {
+		 Expertise tempExpertise = expertiseRepository.findOne(expertise.getExpertiseId());
+		 tempExpertise.setApproved(1);
+		 return expertiseRepository.save(tempExpertise);
+	}
+	public Expertise addExpertise(Expertise expertise) {
+		Expertise tempExpertise = expertiseRepository
+				.findByExpertiseEqualsIgnoreCase(expertise.getExpertise());
+		if (tempExpertise == null) {
+			return expertiseRepository.save(expertise);
+		} else {
+			throw new BadRequestException("Expertise already exists");
+		}
+	}
 
 }
