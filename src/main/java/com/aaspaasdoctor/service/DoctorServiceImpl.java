@@ -201,10 +201,11 @@ public class DoctorServiceImpl {
 
 	private DoctorAddress updateDoctorAddressRepo(Doctor doctor) {
 
-		LocationResponse locationResponse = locationService
-				.getGeoCodeFromAddress(createAddress(doctor));
+		
 		if (doctor.getCity() != null || doctor.getState() != null
 				|| doctor.getPin() != null) {
+			LocationResponse locationResponse = locationService
+					.getGeoCodeFromAddress(createAddress(doctor));
 			doctor.setLongitude(locationResponse.getResults().get(0)
 					.getGeometry().getLocation().getLng());
 			doctor.setLongitude(locationResponse.getResults().get(0)
