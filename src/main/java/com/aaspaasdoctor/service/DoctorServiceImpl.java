@@ -1,31 +1,43 @@
 package com.aaspaasdoctor.service;
 
-import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.aaspaasdoctor.entity.Doctor;
-import com.aaspaasdoctor.entity.Expertise;
+import com.aaspaasdoctor.entity.DoctorAddress;
+import com.aaspaasdoctor.entity.Login;
 import com.aaspaasdoctor.exception.BadRequestException;
 import com.aaspaasdoctor.location.response.LocationResponse;
 import com.aaspaasdoctor.location.service.LocationService;
+import com.aaspaasdoctor.repository.DoctorAddressRepository;
 import com.aaspaasdoctor.repository.DoctorRepository;
-import com.aaspaasdoctor.repository.ExpertiseRepository;
+import com.aaspaasdoctor.utility.BeanMapperUtility;
 
 @Service
 public class DoctorServiceImpl {
 
+	static final Logger LOGGER = LoggerFactory
+			.getLogger(DoctorServiceImpl.class);
 	@Autowired
 	DoctorRepository doctorRepository;
 
 	@Autowired
-	ExpertiseRepository expertiseRepository;
+	DoctorAddressRepository doctorAddressRepository;
 
 	@Autowired
-	DoctorUtility doctorUtility;
+	LoginServiceImpl loginServiceImpl;
+
+	@Autowired
+	BeanMapperUtility beanMapperUtility;
 
 	@Autowired
 	LocationService locationService;
@@ -40,13 +52,14 @@ public class DoctorServiceImpl {
 	private static final String INVALID_DOCTOR_FEE = "Fee details are not valid";
 
 	public List<Doctor> findAllDoctors() {
-		return (List<Doctor>) doctorRepository.findAll();
+		return enhanceDoctorWithDoctorAddress((List<Doctor>) doctorRepository
+				.findAll());
 	}
 
 	public Doctor findDoctorById(Integer doctorId) {
 		Doctor doctor = doctorRepository.findOne(doctorId);
 		if (doctor != null) {
-			return doctor;
+			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_ID);
 		}
@@ -55,7 +68,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByAadhaar(String aadhaar) {
 		Doctor doctor = doctorRepository.findByAadhaar(aadhaar);
 		if (doctor != null) {
-			return doctor;
+			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_AADHAAR);
 		}
@@ -64,7 +77,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByEmail(String email) {
 		Doctor doctor = doctorRepository.findByEmail(email);
 		if (doctor != null) {
-			return doctor;
+			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_EMAIL);
 		}
@@ -74,7 +87,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByMobile(String mobile) {
 		Doctor doctor = doctorRepository.findByMobile(mobile);
 		if (doctor != null) {
-			return doctor;
+			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_MOBILE);
 		}
@@ -83,7 +96,7 @@ public class DoctorServiceImpl {
 	public List<Doctor> findDoctorByName(String name) {
 		List<Doctor> doctors = doctorRepository.findByNameContaining(name);
 		if (doctors != null && !doctors.isEmpty()) {
-			return doctors;
+			return enhanceDoctorWithDoctorAddress(doctors);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_NAME);
 		}
@@ -93,7 +106,7 @@ public class DoctorServiceImpl {
 		List<Doctor> doctors = doctorRepository
 				.findByExpertiseContaining(expertise);
 		if (doctors != null && !doctors.isEmpty()) {
-			return doctors;
+			return enhanceDoctorWithDoctorAddress(doctors);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_EXPERTISE);
 		}
@@ -102,7 +115,7 @@ public class DoctorServiceImpl {
 	public List<Doctor> findDoctorByFee(Integer fee) {
 		List<Doctor> doctors = doctorRepository.findByFee(fee);
 		if (doctors != null && !doctors.isEmpty()) {
-			return doctors;
+			return enhanceDoctorWithDoctorAddress(doctors);
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_FEE);
 		}
@@ -112,6 +125,7 @@ public class DoctorServiceImpl {
 		Doctor doctor = doctorRepository.findOne(doctorId);
 		if (doctor != null) {
 			doctorRepository.delete(doctorId);
+			doctorAddressRepository.deleteByDId(doctorId);
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_ID);
@@ -122,6 +136,7 @@ public class DoctorServiceImpl {
 		Doctor doctor = doctorRepository.findByAadhaar(aadhaar);
 		if (doctor != null) {
 			doctorRepository.deleteByAadhaar(aadhaar);
+			doctorAddressRepository.deleteByDId(doctor.getdId());
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_AADHAAR);
@@ -130,8 +145,10 @@ public class DoctorServiceImpl {
 
 	public String deleteDoctorByMobile(String mobile) {
 		Doctor doctor = doctorRepository.findByMobile(mobile);
+
 		if (doctor != null) {
 			doctorRepository.deleteByMobile(mobile);
+			doctorAddressRepository.deleteByDId(doctor.getdId());
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_MOBILE);
@@ -155,117 +172,47 @@ public class DoctorServiceImpl {
 		}
 	}
 
-	public String updateDoctor(Doctor doctor) {
+	public Doctor updateDoctorRepo(Doctor doctor) {
+		validateDoctor(doctor);
 
-		int updateRow = 0;
-		String response;
-		List<Object> args = new ArrayList<>();
-		StringBuilder query = new StringBuilder("UPDATE doctor SET ");
-		if (!StringUtils.isEmpty(doctor)) {
+		Doctor tempDoctor = findDoctorById(doctor.getdId());
+		try {
+			BeanMapperUtility.copyPropertiesIgnoreNull(doctor, tempDoctor);
+			tempDoctor.setCreatedDate(Calendar.getInstance().getTime());
+			doctorRepository.save(tempDoctor);
 
-			validateDoctor(doctor);
+			updateDoctorAddressRepo(tempDoctor);
 
-			updateRow = updateRow
-					+ doctorUtility.appendDoctorName(doctor, query, args);
-			updateRow = doctorUtility.appendDoctorHomeAddress(updateRow,
-					doctor, query, args);
-			updateRow = doctorUtility.appendDoctorHighestDegree(updateRow,
-					doctor, query, args);
-			updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorIsGovernmentServent(
-					updateRow, doctor, query, args);
-			updateRow = doctorUtility.appendDoctorOneTimeFee(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorDaysCheckFree(updateRow,
-					doctor, query, args);
-			updateRow = doctorUtility.appendDoctorClinicAddress(updateRow,
-					doctor, query, args);
-			updateRow = doctorUtility.appendDoctorMobile(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorAadhaarNumber(updateRow,
-					doctor, query, args);
-			updateRow = doctorUtility.appendDoctorEmail(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorGender(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorDesc(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorTiming(updateRow, doctor,
-					query, args);
-			updateRow = doctorUtility.appendDoctorProfilePicPath(updateRow,
-					doctor, query, args);
-			doctorUtility.appendDoctorDOB(updateRow, doctor, query, args);
+			return tempDoctor;
 
-			query.append("  WHERE dId = ? ");
-			args.add(doctor.getdId());
-
-			// int update = jdbcTemplate.update(query.toString(),
-			// args.toArray());
-			int update = 1;
-			if (update > 0) {
-
-				if (updateDoctorAddress(doctor) > 0) {
-					response = "Doctor successfully Updated...!!!";
-				} else {
-					return "Doctor Address Details not added";
-				}
-			} else {
-				response = "There is some problem, please try again later...!!!";
-			}
-		} else {
-			response = "Doctor details are Empty, provide some details to update....!!!";
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			LOGGER.error("Doctor details not correct for {} with Error {}",
+					doctor.getdId(), e);
+			throw new BadRequestException(
+					"Doctor Details are not correct please try again ");
 		}
 
-		return response;
 	}
 
-	private int updateDoctorAddress(Doctor doctor) {
-		int updateRow = 0;
-		int tempUpdateRow;
-		boolean updateLocations = false;
-		List<Object> args = new ArrayList<>();
-		StringBuilder query = new StringBuilder("UPDATE doctorAddress SET ");
-		updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
-				query, args);
-		updateRow = doctorUtility.appendDoctorExpertized(updateRow, doctor,
-				query, args);
-		tempUpdateRow = doctorUtility.appendDoctorCity(updateRow, doctor,
-				query, args);
-		if (tempUpdateRow > updateRow) {
-			updateLocations = true;
-			updateRow = tempUpdateRow;
+	public String deleteDoctor(Doctor doctor) {
+		doctorRepository.delete(doctor);
+		return "Doctor deleted Sucessfully";
+	}
+
+	private DoctorAddress updateDoctorAddressRepo(Doctor doctor) {
+
+		LocationResponse locationResponse = locationService
+				.getGeoCodeFromAddress(createAddress(doctor));
+		if (doctor.getCity() != null || doctor.getState() != null
+				|| doctor.getPin() != null) {
+			doctor.setLongitude(locationResponse.getResults().get(0)
+					.getGeometry().getLocation().getLng());
+			doctor.setLongitude(locationResponse.getResults().get(0)
+					.getGeometry().getLocation().getLng());
 		}
-		if (!updateLocations) {
-			tempUpdateRow = doctorUtility.appendDoctorPin(updateRow, doctor,
-					query, args);
-			if (tempUpdateRow > updateRow) {
-				updateLocations = true;
-				updateRow = tempUpdateRow;
-			}
-		} else {
-			updateRow = doctorUtility.appendDoctorPin(tempUpdateRow, doctor,
-					query, args);
-		}
-		updateRow = doctorUtility.appendDoctorState(updateRow, doctor, query,
-				args);
-		updateRow = doctorUtility.appendDoctorLandMark(updateRow, doctor,
-				query, args);
-		if (updateRow > 0) {
-			query.append(" , updatedDate = NOW() ");
-		}
-		if (updateLocations) {
-			LocationResponse locationResponse = locationService
-					.getGeoCodeFromAddress(createAddress(doctor));
-			if (locationResponse != null) {
-				doctorUtility.appendDoctorLatitdueAndLogitude(updateRow,
-						locationResponse, query, args);
-			}
-		}
-		query.append("  WHERE dId = ? ");
-		args.add(doctor.getdId());
-		// TODO jdbcTemplate..update(query.toString(), args.toArray());
-		return 0;
+		doctor.setCreateDate(Calendar.getInstance().getTime());
+		return doctorAddressRepository.save(doctor);
+
 	}
 
 	private String createAddress(Doctor doctor) {
@@ -273,30 +220,44 @@ public class DoctorServiceImpl {
 				+ doctor.getState() + ", India";
 	}
 
-	public List<Expertise> getAllExpertized() {
-		Integer unApproved = 0;
-		return (List<Expertise>) expertiseRepository.findByApproved(unApproved);
-	}
-	
-	public List<Expertise> getUnApprovedExpertise(){
-		Integer approved = 1;
-		return (List<Expertise>) expertiseRepository.findByApproved(approved);
+	public List<Doctor> enhanceDoctorWithDoctorAddress(List<Doctor> doctors) {
 
-	}
-
-	public Expertise approveExpertise(Expertise expertise) {
-		 Expertise tempExpertise = expertiseRepository.findOne(expertise.getExpertiseId());
-		 tempExpertise.setApproved(1);
-		 return expertiseRepository.save(tempExpertise);
-	}
-	public Expertise addExpertise(Expertise expertise) {
-		Expertise tempExpertise = expertiseRepository
-				.findByExpertiseEqualsIgnoreCase(expertise.getExpertise());
-		if (tempExpertise == null) {
-			return expertiseRepository.save(expertise);
-		} else {
-			throw new BadRequestException("Expertise already exists");
+		DoctorAddress doctorAddress;
+		for (Doctor doctor : doctors) {
+			doctorAddress = doctorAddressRepository.findByDId(doctor.getdId());
+			try {
+				BeanUtils.copyProperties(doctor, doctorAddress);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				LOGGER.error("Doctor Address mapping Error {}", e);
+			}
 		}
+
+		return doctors;
+
+	}
+
+	public Doctor doctorSignUp(Doctor doctor) {
+
+		Doctor tempDoctor = doctorRepository.save(doctor);
+		Login login = new Login();
+		login.setAadhaar(doctor.getAadhaar());
+		login.setEmail(doctor.getEmail());
+		login.setMobile(doctor.getMobile());
+		login.setPassword(doctor.getPassword());
+		login.setType("d");
+		login.setTypeId(doctor.getdId());
+		loginServiceImpl.addLoginDetails(login);
+		doctorAddressRepository.save(doctor);
+		return tempDoctor;
+
+	}
+
+	public List<Doctor> getRecentDoctors(Integer days) {
+		Calendar startDate = Calendar.getInstance();
+		startDate.add(Calendar.DATE, -days);
+		return enhanceDoctorWithDoctorAddress(doctorRepository
+				.findByCreatedDateBetween(startDate.getTime(), Calendar
+						.getInstance().getTime()));
 	}
 
 }

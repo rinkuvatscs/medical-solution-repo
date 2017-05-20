@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aaspaasdoctor.entity.Doctor;
-import com.aaspaasdoctor.entity.Expertise;
 import com.aaspaasdoctor.response.DoctorResponse;
 import com.aaspaasdoctor.service.DoctorServiceImpl;
 
@@ -51,6 +50,13 @@ public class DoctorController {
 
 		return new DoctorResponse(
 				doctorServiceImpl.deleteDoctorByMobile(mobile));
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/delete")
+	@ResponseBody
+	public DoctorResponse deleteDoctor(@RequestBody Doctor doctor) {
+
+		return new DoctorResponse(doctorServiceImpl.deleteDoctor(doctor));
 	}
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/{id}/id")
@@ -104,48 +110,24 @@ public class DoctorController {
 		return doctorServiceImpl.findDoctorByFee(fee);
 	}
 
-	
-	
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/all/expertisation")
-	@ResponseBody
-	public List<Expertise> getAllExpertisations() {
-
-		return doctorServiceImpl.getAllExpertized();
-	}
-
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/add/{expertise}/expertisation")
-	@ResponseBody
-	public Expertise addExpertisation(@PathVariable String expertise) {
-
-		return doctorServiceImpl.addExpertise(new Expertise(expertise));
-	}
-	
-	
-	
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/all/unapproved/expertisation")
-	@ResponseBody
-	public List<Expertise> getAllUnApprovedExpertisations() {
-
-		return doctorServiceImpl.getUnApprovedExpertise();
-	}
-
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/approve/{expertise}/expertisation")
-	@ResponseBody
-	public Expertise addExpertisation(@PathVariable Integer expertiseId) {
-
-			return doctorServiceImpl.approveExpertise(new Expertise(expertiseId));
-	}
-
-	
-	
-	// Same as old for dynamic
-	
 	@RequestMapping(method = RequestMethod.PUT, value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	
-	public DoctorResponse updateDoctor(@RequestBody Doctor doctor) {
-		
-		return new DoctorResponse(doctorServiceImpl.updateDoctor(doctor));
+	public Doctor updateDoctorRepo(@RequestBody Doctor doctor) {
+
+		return doctorServiceImpl.updateDoctorRepo(doctor);
+	}
+
+	@RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/signup")
+	@ResponseBody
+	public Doctor doctorSignUp(@RequestBody Doctor doctor) {
+
+		return doctorServiceImpl.doctorSignUp(doctor);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/{days}/recentdoctors")
+	@ResponseBody
+	public List<Doctor> getRecentDoctors(@PathVariable Integer days) {
+		return doctorServiceImpl.getRecentDoctors(days);
 	}
 
 }

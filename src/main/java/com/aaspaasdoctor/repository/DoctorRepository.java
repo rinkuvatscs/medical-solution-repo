@@ -1,5 +1,6 @@
 package com.aaspaasdoctor.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
@@ -23,5 +24,7 @@ public interface DoctorRepository extends CrudRepository<Doctor, Integer> {
 	List<Doctor> findByNameContaining(String name);
 
 	List<Doctor> findByExpertiseContaining(String expertise);
-
+	
+	List<Doctor> findByCreatedDateBetween(Date start , Date end) ;
+	
 }

@@ -1,4 +1,4 @@
-package com.aaspaasdoctor.service;
+/*package com.aaspaasdoctor.utility;
 
 import java.util.List;
 
@@ -313,3 +313,4 @@ public class DoctorUtility {
 	
 
 }
+*/

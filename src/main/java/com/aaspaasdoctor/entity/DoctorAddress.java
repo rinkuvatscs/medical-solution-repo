@@ -1,18 +1,40 @@
 package com.aaspaasdoctor.entity;
 
 import java.math.BigInteger;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 
+@Entity
+@Table(name = "doctor_address")
 public class DoctorAddress {
 
+	
+	@Id
+	@Column(name = "doc_address_id")
+	private Integer docAddressId ;
+	
+	@Column(name = "d_id")
+	private Integer dId ;
+	
 	private String timing ;
 	private String city;
 	private String state ;
 	private BigInteger pin ;
 	private String landmark ;
-	private float latitude ;
-	private float longitude ;
+	private double latitude ;
+	private double longitude ;
 	
+	@Column(name = "created_date")
+	private Date createDate ;
+	
+	@Column(name = "updated_date")
+	private Date updatedDate ;
+
 	public String getTiming() {
 		return timing;
 	}
@@ -44,19 +66,42 @@ public class DoctorAddress {
 	public void setLandmark(String landmark) {
 		this.landmark = landmark;
 	}
-	public float getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
-	public void setLatitude(float latitude) {
+	public void setLatitude(double latitude) {
 		this.latitude = latitude;
 	}
-	public float getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
-	public void setLongitude(float longitude) {
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	
+	public Integer getDocAddressId() {
+		return docAddressId;
+	}
+	public void setDocAddressId(Integer docAddressId) {
+		this.docAddressId = docAddressId;
+	}
+	public Integer getdId() {
+		return dId;
+	}
+	public void setdId(Integer dId) {
+		this.dId = dId;
+	}
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
 	@Override
 	public String toString() {
 		return "DoctorAddress [timing=" + timing + ", city=" + city
