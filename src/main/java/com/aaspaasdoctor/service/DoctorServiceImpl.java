@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.aaspaasdoctor.entity.Doctor;
+import com.aaspaasdoctor.entity.DoctorAddress;
 import com.aaspaasdoctor.entity.Login;
 import com.aaspaasdoctor.exception.BadRequestException;
 import com.aaspaasdoctor.location.response.LocationResponse;
@@ -236,7 +237,11 @@ public class DoctorServiceImpl {
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
 		loginServiceImpl.addLoginDetails(login);
-		doctorRepository.save(doctor);
+		
+		DoctorAddress doctorAddress = new DoctorAddress() ;
+		doctorAddress.setdId(tempDoctor.getdId());
+		doctorAddressRepository.save(doctorAddress);
+		tempDoctor.setPassword(login.getPassword());
 		return tempDoctor;
 
 	}
@@ -246,6 +251,18 @@ public class DoctorServiceImpl {
 		startDate.add(Calendar.DATE, -days);
 		return doctorRepository.findByCreatedDateBetween(startDate.getTime(),
 				Calendar.getInstance().getTime());
+	}
+	
+	
+	public String forgotPassword(String mobile) {
+		
+		Doctor doctor = doctorRepository.findByMobile(mobile);
+		if(doctor != null ) {
+			return null ;
+		} else {
+			throw new BadRequestException(
+					"Mobile is not registered");
+		}
 	}
 
 }

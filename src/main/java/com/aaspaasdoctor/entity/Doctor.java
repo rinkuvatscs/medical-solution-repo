@@ -76,6 +76,7 @@ public class Doctor  {
 	@JoinColumn(name = "d_id")
 	private DoctorAddress doctorAddress;
 
+	@Column(name = "description")
 	private String desc;
 
 	@Transient

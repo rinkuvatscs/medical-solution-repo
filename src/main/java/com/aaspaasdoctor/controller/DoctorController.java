@@ -130,4 +130,11 @@ public class DoctorController {
 		return doctorServiceImpl.getRecentDoctors(days);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/forgot/{mobile}")
+	@ResponseBody
+	public String forgotPassword(@PathVariable String mobile) {
+
+		return doctorServiceImpl.forgotPassword(mobile);
+
+	}
 }
