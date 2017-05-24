@@ -8,5 +8,5 @@ public interface DoctorAddressRepository extends CrudRepository<DoctorAddress, I
 
 	DoctorAddress findByDId(Integer dId) ;
 	
-	DoctorAddress deleteByDId(Integer dId) ;
+	void deleteByDId(Integer dId) ;
 }

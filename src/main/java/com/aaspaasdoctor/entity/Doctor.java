@@ -2,14 +2,21 @@ package com.aaspaasdoctor.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Table(name = "doctor")
 @Entity
-public class Doctor extends DoctorAddress{
+public class Doctor  {
 
 	@Id
 	@Column(name = "d_id")
@@ -17,6 +24,7 @@ public class Doctor extends DoctorAddress{
 
 	private String name;
 	private String mobile;
+	@Column(name = "aadhaar_number")
 	private String aadhaar;
 	private String clinic;
 
@@ -54,18 +62,33 @@ public class Doctor extends DoctorAddress{
 	@Column(name = "profile_pic_path")
 	private String profilePicPath;
 
-	@Column(name = "created_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_date", columnDefinition = "DATETIME")
 	private Date createdDate;
 
-	@Column(name = "updated_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "updated_date", columnDefinition = "DATETIME")
 	private Date updatedDate;
+
+	@OneToOne(cascade =  CascadeType.ALL )
+	@JoinColumn(name = "d_id")
+	private DoctorAddress doctorAddress;
 
 	private String desc;
 
+	@Transient
 	private String password;
-	
+
 	public String getPassword() {
 		return password;
+	}
+
+	public DoctorAddress getDoctorAddress() {
+		return doctorAddress;
+	}
+
+	public void setDoctorAddress(DoctorAddress doctorAddress) {
+		this.doctorAddress = doctorAddress;
 	}
 
 	public void setPassword(String password) {

@@ -1,19 +1,19 @@
 package com.aaspaasdoctor.service;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.aaspaasdoctor.entity.Doctor;
-import com.aaspaasdoctor.entity.DoctorAddress;
 import com.aaspaasdoctor.entity.Login;
 import com.aaspaasdoctor.exception.BadRequestException;
 import com.aaspaasdoctor.location.response.LocationResponse;
@@ -23,6 +23,7 @@ import com.aaspaasdoctor.repository.DoctorRepository;
 import com.aaspaasdoctor.utility.BeanMapperUtility;
 
 @Service
+@Transactional
 public class DoctorServiceImpl {
 
 	static final Logger LOGGER = LoggerFactory
@@ -52,14 +53,13 @@ public class DoctorServiceImpl {
 	private static final String INVALID_DOCTOR_FEE = "Fee details are not valid";
 
 	public List<Doctor> findAllDoctors() {
-		return enhanceDoctorWithDoctorAddress((List<Doctor>) doctorRepository
-				.findAll());
+		return (List<Doctor>) doctorRepository.findAll();
 	}
 
 	public Doctor findDoctorById(Integer doctorId) {
 		Doctor doctor = doctorRepository.findOne(doctorId);
 		if (doctor != null) {
-			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
+			return doctor;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_ID);
 		}
@@ -68,7 +68,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByAadhaar(String aadhaar) {
 		Doctor doctor = doctorRepository.findByAadhaar(aadhaar);
 		if (doctor != null) {
-			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
+			return doctor;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_AADHAAR);
 		}
@@ -77,7 +77,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByEmail(String email) {
 		Doctor doctor = doctorRepository.findByEmail(email);
 		if (doctor != null) {
-			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
+			return doctor;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_EMAIL);
 		}
@@ -87,7 +87,7 @@ public class DoctorServiceImpl {
 	public Doctor findDoctorByMobile(String mobile) {
 		Doctor doctor = doctorRepository.findByMobile(mobile);
 		if (doctor != null) {
-			return enhanceDoctorWithDoctorAddress(Arrays.asList(doctor)).get(0);
+			return doctor;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_MOBILE);
 		}
@@ -96,7 +96,7 @@ public class DoctorServiceImpl {
 	public List<Doctor> findDoctorByName(String name) {
 		List<Doctor> doctors = doctorRepository.findByNameContaining(name);
 		if (doctors != null && !doctors.isEmpty()) {
-			return enhanceDoctorWithDoctorAddress(doctors);
+			return doctors;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_NAME);
 		}
@@ -106,7 +106,7 @@ public class DoctorServiceImpl {
 		List<Doctor> doctors = doctorRepository
 				.findByExpertiseContaining(expertise);
 		if (doctors != null && !doctors.isEmpty()) {
-			return enhanceDoctorWithDoctorAddress(doctors);
+			return doctors;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_EXPERTISE);
 		}
@@ -115,17 +115,18 @@ public class DoctorServiceImpl {
 	public List<Doctor> findDoctorByFee(Integer fee) {
 		List<Doctor> doctors = doctorRepository.findByFee(fee);
 		if (doctors != null && !doctors.isEmpty()) {
-			return enhanceDoctorWithDoctorAddress(doctors);
+			return doctors;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_FEE);
 		}
 	}
 
+	
 	public String deleteDoctorById(Integer doctorId) {
 		Doctor doctor = doctorRepository.findOne(doctorId);
 		if (doctor != null) {
-			doctorRepository.delete(doctorId);
 			doctorAddressRepository.deleteByDId(doctorId);
+			doctorRepository.delete(doctorId);
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_ID);
@@ -135,8 +136,8 @@ public class DoctorServiceImpl {
 	public String deleteDoctorByAadhaar(String aadhaar) {
 		Doctor doctor = doctorRepository.findByAadhaar(aadhaar);
 		if (doctor != null) {
-			doctorRepository.deleteByAadhaar(aadhaar);
 			doctorAddressRepository.deleteByDId(doctor.getdId());
+			doctorRepository.deleteByAadhaar(aadhaar);
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_AADHAAR);
@@ -147,8 +148,8 @@ public class DoctorServiceImpl {
 		Doctor doctor = doctorRepository.findByMobile(mobile);
 
 		if (doctor != null) {
-			doctorRepository.deleteByMobile(mobile);
 			doctorAddressRepository.deleteByDId(doctor.getdId());
+			doctorRepository.deleteByMobile(mobile);
 			return DOCTOR_DELETED;
 		} else {
 			throw new BadRequestException(INVALID_DOCTOR_MOBILE);
@@ -179,9 +180,10 @@ public class DoctorServiceImpl {
 		try {
 			BeanMapperUtility.copyPropertiesIgnoreNull(doctor, tempDoctor);
 			tempDoctor.setCreatedDate(Calendar.getInstance().getTime());
-			doctorRepository.save(tempDoctor);
 
 			updateDoctorAddressRepo(tempDoctor);
+
+			doctorRepository.save(tempDoctor);
 
 			return tempDoctor;
 
@@ -199,42 +201,30 @@ public class DoctorServiceImpl {
 		return "Doctor deleted Sucessfully";
 	}
 
-	private DoctorAddress updateDoctorAddressRepo(Doctor doctor) {
+	private void updateDoctorAddressRepo(Doctor doctor) {
 
-		
-		if (doctor.getCity() != null || doctor.getState() != null
-				|| doctor.getPin() != null) {
+		if (doctor.getDoctorAddress().getCity() != null
+				|| doctor.getState() != null
+				|| doctor.getDoctorAddress().getPin() != null) {
 			LocationResponse locationResponse = locationService
 					.getGeoCodeFromAddress(createAddress(doctor));
-			doctor.setLongitude(locationResponse.getResults().get(0)
-					.getGeometry().getLocation().getLng());
-			doctor.setLongitude(locationResponse.getResults().get(0)
-					.getGeometry().getLocation().getLng());
+			doctor.getDoctorAddress().setLongitude(
+					locationResponse.getResults().get(0).getGeometry()
+							.getLocation().getLng());
+			doctor.getDoctorAddress().setLongitude(
+					locationResponse.getResults().get(0).getGeometry()
+							.getLocation().getLng());
 		}
-		doctor.setCreateDate(Calendar.getInstance().getTime());
-		return doctorAddressRepository.save(doctor);
-
+		if (doctor.getDoctorAddress().getDoctorAddressCreateDate() != null) {
+			doctor.getDoctorAddress().setDoctorAddressCreateDate(
+					Calendar.getInstance().getTime());
+		}
+		doctor.setUpdatedDate(Calendar.getInstance().getTime());
 	}
 
 	private String createAddress(Doctor doctor) {
-		return doctor.getClinic() + ", " + doctor.getCity() + " ,"
-				+ doctor.getState() + ", India";
-	}
-
-	public List<Doctor> enhanceDoctorWithDoctorAddress(List<Doctor> doctors) {
-
-		DoctorAddress doctorAddress;
-		for (Doctor doctor : doctors) {
-			doctorAddress = doctorAddressRepository.findByDId(doctor.getdId());
-			try {
-				BeanUtils.copyProperties(doctor, doctorAddress);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				LOGGER.error("Doctor Address mapping Error {}", e);
-			}
-		}
-
-		return doctors;
-
+		return doctor.getClinic() + ", " + doctor.getDoctorAddress().getCity()
+				+ " ," + doctor.getState() + ", India";
 	}
 
 	public Doctor doctorSignUp(Doctor doctor) {
@@ -248,7 +238,7 @@ public class DoctorServiceImpl {
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
 		loginServiceImpl.addLoginDetails(login);
-		doctorAddressRepository.save(doctor);
+		doctorRepository.save(doctor);
 		return tempDoctor;
 
 	}
@@ -256,9 +246,8 @@ public class DoctorServiceImpl {
 	public List<Doctor> getRecentDoctors(Integer days) {
 		Calendar startDate = Calendar.getInstance();
 		startDate.add(Calendar.DATE, -days);
-		return enhanceDoctorWithDoctorAddress(doctorRepository
-				.findByCreatedDateBetween(startDate.getTime(), Calendar
-						.getInstance().getTime()));
+		return doctorRepository.findByCreatedDateBetween(startDate.getTime(),
+				Calendar.getInstance().getTime());
 	}
 
 }

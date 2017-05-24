@@ -6,7 +6,10 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 
 @Entity
@@ -29,11 +32,13 @@ public class DoctorAddress {
 	private double latitude ;
 	private double longitude ;
 	
-	@Column(name = "created_date")
-	private Date createDate ;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "doc_add_created_date" , columnDefinition = "DATETIME")
+	private Date doctorAddressCreateDate ;
 	
-	@Column(name = "updated_date")
-	private Date updatedDate ;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "doc_add_updated_date" , columnDefinition = "DATETIME")
+	private Date doctorAddressUpdatedDate ;
 
 	public String getTiming() {
 		return timing;
@@ -89,18 +94,18 @@ public class DoctorAddress {
 	}
 	public void setdId(Integer dId) {
 		this.dId = dId;
+	}	
+	public Date getDoctorAddressCreateDate() {
+		return doctorAddressCreateDate;
 	}
-	public Date getCreateDate() {
-		return createDate;
+	public void setDoctorAddressCreateDate(Date doctorAddressCreateDate) {
+		this.doctorAddressCreateDate = doctorAddressCreateDate;
 	}
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
+	public Date getDoctorAddressUpdatedDate() {
+		return doctorAddressUpdatedDate;
 	}
-	public Date getUpdatedDate() {
-		return updatedDate;
-	}
-	public void setUpdatedDate(Date updatedDate) {
-		this.updatedDate = updatedDate;
+	public void setDoctorAddressUpdatedDate(Date doctorAddressUpdatedDate) {
+		this.doctorAddressUpdatedDate = doctorAddressUpdatedDate;
 	}
 	@Override
 	public String toString() {
