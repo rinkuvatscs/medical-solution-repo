@@ -11,11 +11,7 @@ public interface DoctorRepository extends CrudRepository<Doctor, Integer> {
 
 	Doctor findByAadhaar(String aadhaar);
 
-	void deleteByAadhaar(String aadhaar);
-
 	Doctor findByMobile(String mobile);
-
-	void deleteByMobile(String mobile);
 
 	Doctor findByEmail(String email);
 
@@ -24,7 +20,11 @@ public interface DoctorRepository extends CrudRepository<Doctor, Integer> {
 	List<Doctor> findByNameContaining(String name);
 
 	List<Doctor> findByExpertiseContaining(String expertise);
-	
-	List<Doctor> findByCreatedDateBetween(Date start , Date end) ;
-	
+
+	List<Doctor> findByCreatedDateBetween(Date start, Date end);
+
+	void deleteByMobile(String mobile);
+
+	void deleteByAadhaar(String aadhaar);
+
 }

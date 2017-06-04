@@ -1,5 +1,10 @@
 package com.aaspaasdoctor.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,7 @@ import com.aaspaasdoctor.service.DoctorServiceImpl;
 
 @RestController
 @RequestMapping("/api/doctor")
+@Api(basePath = "/doctor", value = "doctor", description = "Operations with Landlords", produces = "application/json")
 public class DoctorController {
 
 	@Autowired
@@ -31,6 +37,10 @@ public class DoctorController {
 
 	@RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/delete/{id}/id")
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(value = "delete doctor", notes = "delete doctor")
+	@ApiResponses(value = {
+			@ApiResponse(code = 400, message = "Fields are with validation errors"),
+			@ApiResponse(code = 201, message = "") })
 	public DoctorResponse deleteDoctorById(@PathVariable Integer id) {
 
 		return new DoctorResponse(doctorServiceImpl.deleteDoctorById(id));

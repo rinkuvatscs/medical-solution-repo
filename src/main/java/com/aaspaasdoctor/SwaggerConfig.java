@@ -12,6 +12,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -54,11 +55,17 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     @Bean
     public Docket restfulApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName(swaggerGroupName)
+                /*.groupName(swaggerGroupName)
                 .select()
-                .paths(PathSelectors.regex("/"+swaggerEnableUrl+".*"))
+                .paths(PathSelectors.regex("/"+swaggerEnableUrl+"/*"))
                 .build()
-                .apiInfo(apiInfo());
+                .apiInfo(apiInfo());*/
+        
+        .select()
+        .apis(RequestHandlerSelectors.any())
+        .paths(PathSelectors.regex("/.*"))
+        .build()
+        .apiInfo(apiInfo());
     }
     @Bean
     public ViewResolver getViewResolver() {

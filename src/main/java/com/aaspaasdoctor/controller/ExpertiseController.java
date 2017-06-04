@@ -1,4 +1,4 @@
-package com.aaspaasdoctor.controller;
+/*package com.aaspaasdoctor.controller;
 
 import java.util.List;
 
@@ -49,3 +49,4 @@ public class ExpertiseController {
 				.approveExpertise(new Expertise(expertiseId));
 	}
 }
+*/

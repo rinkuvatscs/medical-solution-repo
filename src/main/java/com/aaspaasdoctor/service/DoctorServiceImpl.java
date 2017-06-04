@@ -120,7 +120,6 @@ public class DoctorServiceImpl {
 		}
 	}
 
-	
 	public String deleteDoctorById(Integer doctorId) {
 		Doctor doctor = doctorRepository.findOne(doctorId);
 		if (doctor != null) {
@@ -178,12 +177,17 @@ public class DoctorServiceImpl {
 		Doctor tempDoctor = findDoctorById(doctor.getdId());
 		try {
 			BeanMapperUtility.copyPropertiesIgnoreNull(doctor, tempDoctor);
-			tempDoctor.setCreatedDate(Calendar.getInstance().getTime());
-
+            tempDoctor.setUpdatedDate(Calendar.getInstance().getTime());
 			updateDoctorAddressRepo(tempDoctor);
 
 			doctorRepository.save(tempDoctor);
-
+			
+			Login login = new Login();
+			login.setAadhaar(tempDoctor.getAadhaar());
+			login.setEmail(tempDoctor.getEmail());
+			login.setMobile(tempDoctor.getMobile());
+			login.setPassword(tempDoctor.getPassword());
+			loginServiceImpl.addLoginDetails(login);
 			return tempDoctor;
 
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -229,6 +233,7 @@ public class DoctorServiceImpl {
 	public Doctor doctorSignUp(Doctor doctor) {
 
 		Doctor tempDoctor = doctorRepository.save(doctor);
+		tempDoctor.setCreatedDate(Calendar.getInstance().getTime());
 		Login login = new Login();
 		login.setAadhaar(doctor.getAadhaar());
 		login.setEmail(doctor.getEmail());
@@ -237,8 +242,8 @@ public class DoctorServiceImpl {
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
 		loginServiceImpl.addLoginDetails(login);
-		
-		DoctorAddress doctorAddress = new DoctorAddress() ;
+
+		DoctorAddress doctorAddress = new DoctorAddress();
 		doctorAddress.setdId(tempDoctor.getdId());
 		doctorAddressRepository.save(doctorAddress);
 		tempDoctor.setPassword(login.getPassword());
@@ -252,16 +257,14 @@ public class DoctorServiceImpl {
 		return doctorRepository.findByCreatedDateBetween(startDate.getTime(),
 				Calendar.getInstance().getTime());
 	}
-	
-	
+
 	public String forgotPassword(String mobile) {
-		
+
 		Doctor doctor = doctorRepository.findByMobile(mobile);
-		if(doctor != null ) {
-			return null ;
+		if (doctor != null) {
+			return null;
 		} else {
-			throw new BadRequestException(
-					"Mobile is not registered");
+			throw new BadRequestException("Mobile is not registered");
 		}
 	}
 
