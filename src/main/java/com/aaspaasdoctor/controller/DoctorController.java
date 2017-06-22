@@ -127,7 +127,7 @@ public class DoctorController {
 		return doctorServiceImpl.updateDoctorRepo(doctor);
 	}
 
-	@RequestMapping(method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, value = "/signup")
+	@RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value = "/signup")
 	@ResponseBody
 	public Doctor doctorSignUp(@RequestBody Doctor doctor) {
 

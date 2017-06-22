@@ -80,7 +80,7 @@ public class PatientServiceImpl {
 		login.setPassword(patient.getPassword());
 		login.setType("d");
 		login.setTypeId(patient.getpId());
-		loginServiceImpl.addLoginDetails(login);
+		loginServiceImpl.addLogin(login);
 		
 		PatientAddress patientAddress = new PatientAddress() ;
 		patientAddress.setpId(tempPatient.getpId());
@@ -106,7 +106,7 @@ public class PatientServiceImpl {
 			login.setPassword(tempPatient.getPassword());
 			login.setType("p");
 			login.setTypeId(tempPatient.getpId());
-			loginServiceImpl.addLoginDetails(login);
+			loginServiceImpl.addLogin(login);
 			return tempPatient;
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			LOGGER.error("Patient details not correct for {} with Error {}",

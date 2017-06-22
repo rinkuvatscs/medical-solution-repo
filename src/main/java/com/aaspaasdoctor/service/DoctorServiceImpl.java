@@ -187,7 +187,7 @@ public class DoctorServiceImpl {
 			login.setEmail(tempDoctor.getEmail());
 			login.setMobile(tempDoctor.getMobile());
 			login.setPassword(tempDoctor.getPassword());
-			loginServiceImpl.addLoginDetails(login);
+			loginServiceImpl.addLogin(login);
 			return tempDoctor;
 
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -241,7 +241,7 @@ public class DoctorServiceImpl {
 		login.setPassword(doctor.getPassword());
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
-		loginServiceImpl.addLoginDetails(login);
+		loginServiceImpl.addLogin(login);
 
 		DoctorAddress doctorAddress = new DoctorAddress();
 		doctorAddress.setdId(tempDoctor.getdId());

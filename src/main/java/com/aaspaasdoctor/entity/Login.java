@@ -14,36 +14,38 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
-@Table(name ="login")
+@Table(name = "login")
 public class Login {
 
-	
 	@Id
 	@Column(name = "login_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY )
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer loginId;
-	
-	private String mobile ;
-	
-	private String password ;
-	
-	private String aadhaar ;
-	
-	private String email ;
-	
-	private String type ;
-	
-	@Column(name = "type_id")
-	private Integer typeId ;
-	
-	@Column(name = "created_date")
-	private Date createDate ;
-	
-	@Column(name = "updated_date")
-	private Date updatedDate ;
-	
+
+	private String mobile;
+
+	private String password;
+
+	private String aadhaar;
+
+	private String email;
+
+	private String type;
+
 	@Transient
-	private PasswordEncoder passwordEncode = new BCryptPasswordEncoder(); 
+	private boolean isEncode = true;
+
+	@Column(name = "type_id")
+	private Integer typeId;
+
+	@Column(name = "created_date")
+	private Date createDate;
+
+	@Column(name = "updated_date")
+	private Date updatedDate;
+
+	@Transient
+	private PasswordEncoder passwordEncode = new BCryptPasswordEncoder();
 
 	public Integer getLoginId() {
 		return loginId;
@@ -65,8 +67,20 @@ public class Login {
 		return password;
 	}
 
+	public boolean isEncode() {
+		return isEncode;
+	}
+
+	public void setEncode(boolean isEncode) {
+		this.isEncode = isEncode;
+	}
+
 	public void setPassword(String password) {
-		this.password = passwordEncode.encode(password);
+		if (isEncode) {
+			this.password = passwordEncode.encode(password);
+		} else {
+			this.password = password;
+		}
 	}
 
 	public String getAadhaar() {
@@ -126,6 +140,4 @@ public class Login {
 				+ "]";
 	}
 
-	
-	
 }
