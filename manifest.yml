@@ -1,0 +1,5 @@
+---
+applications:
+- name: Doctors
+  memory: 700M
+  path: build/libs/medical-solution-repo-0.0.1-SNAPSHOT.jar

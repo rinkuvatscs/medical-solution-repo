@@ -33,7 +33,7 @@ public class Login {
 	private String type;
 
 	@Transient
-	private boolean isEncode = true;
+	private boolean isEncode;
 
 	@Column(name = "type_id")
 	private Integer typeId;
