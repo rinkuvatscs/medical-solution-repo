@@ -19,10 +19,10 @@ public class TodoList {
 	@Column(name = "todo_message")
 	private String message ;
 	
-	@Column(name = "pId")
+	@Column(name = "p_id")
 	private Integer patientId;
 	
-	@Column(name = "dId")
+	@Column(name = "d_id")
 	private Integer doctorId;
 
 	public Integer getId() {
