@@ -52,7 +52,7 @@ public class NotificationController {
 	// patientId.
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/Notification/patient/{pId}/id/{status}/status")
 	@ResponseBody
-	public List<Notification> getNotificationforPatientByDoctorIdAndStatus(@PathVariable int pId,
+	public List<Notification> getNotificationforPatientByPatientIdAndStatus(@PathVariable int pId,
 			@PathVariable int status) {
 		return notificationServiceImpl.findpatientByPatientIdAndStatus(pId, status);
 	}
