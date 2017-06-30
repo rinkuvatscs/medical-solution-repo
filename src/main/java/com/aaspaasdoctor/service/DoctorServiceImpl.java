@@ -231,16 +231,20 @@ public class DoctorServiceImpl {
 	}
 
 	public Doctor doctorSignUp(Doctor doctor) {
-
-		Doctor tempDoctor = doctorRepository.save(doctor);
-		tempDoctor.setCreatedDate(Calendar.getInstance().getTime());
 		Login login = new Login();
+		login.setPassword(doctor.getPassword());
+
+		doctor.setCreatedDate(Calendar.getInstance().getTime());
+		doctor.setPassword(null);
+		Doctor tempDoctor = doctorRepository.save(doctor);
+
 		login.setAadhaar(doctor.getAadhaar());
 		login.setEmail(doctor.getEmail());
 		login.setMobile(doctor.getMobile());
-		login.setPassword(doctor.getPassword());
+
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
+		login.setEncode(true);
 		loginServiceImpl.addLogin(login);
 
 		DoctorAddress doctorAddress = new DoctorAddress();
