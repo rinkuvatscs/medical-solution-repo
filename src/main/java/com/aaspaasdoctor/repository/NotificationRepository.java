@@ -10,4 +10,8 @@ public interface NotificationRepository extends CrudRepository<Notification, Int
 
 	java.util.List<Notification> findByDoctorId(Integer doctorId);
 
+	java.util.List<Notification> findDoctorByDoctorIdAndStatus(Integer doctorId, Integer status);
+
+	java.util.List<Notification> findPatientByPatientIdAndStatus(Integer patientId, Integer status);
+
 }

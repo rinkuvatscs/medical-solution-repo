@@ -35,6 +35,15 @@ public class NotificationServiceImpl {
 		return new Notification();
 	}
 
+	public Notification updateNotificationStatusById(Notification notification) {
+		Notification tempNotification = notificationRepository.findOne(notification.getId());
+		if (tempNotification != null && tempNotification.getId() > 0) {
+			tempNotification.setStatus(notification.getStatus());
+			return notificationRepository.save(tempNotification);
+		}
+		return new Notification();
+	}
+
 	public List<Notification> findByDoctorId(int dId) {
 		return notificationRepository.findByDoctorId(dId);
 	}
@@ -47,6 +56,14 @@ public class NotificationServiceImpl {
 		} else {
 			return new Notification();
 		}
+	}
+
+	public List<Notification> findDoctorByDoctorIdAndStatus(int dId, int status) {
+		return notificationRepository.findDoctorByDoctorIdAndStatus(dId, status);
+	}
+
+	public List<Notification> findpatientByPatientIdAndStatus(int pId, int status) {
+		return notificationRepository.findPatientByPatientIdAndStatus(pId, status);
 	}
 
 }
