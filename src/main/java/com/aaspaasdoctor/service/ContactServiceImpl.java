@@ -1,6 +1,7 @@
 package com.aaspaasdoctor.service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import com.aaspaasdoctor.repository.ContactRepository;
 import com.aaspaasdoctor.utility.BeanMapperUtility;
 
 @Service
-public class MiscServiceImpl {
+public class ContactServiceImpl {
 
 	@Autowired
 	private ContactRepository contactRepository;
@@ -19,7 +20,7 @@ public class MiscServiceImpl {
 		return contactRepository.save(contact);
 	}
 
-	public Contact findContactByEmail(String email) {
+	public List<Contact> findContactByEmail(String email) {
 		return contactRepository.findByEmail(email);
 	}
 

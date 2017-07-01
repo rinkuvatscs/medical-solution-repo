@@ -1,10 +1,19 @@
 package com.aaspaasdoctor.entity;
 
+
+import java.util.Date;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+@Entity
+@Table(name ="contact_us")
 public class Contact {
 
 	//INSERT INTO contactUs (contactUsId, name, mobile, email, message) VALUES (0, ?, ?, ?, ?)"
@@ -21,6 +30,18 @@ public class Contact {
 	private String email;
 	
 	private String message;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_date", columnDefinition = "DATETIME")
+	private Date createTime;
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 
 	public Integer getId() {
 		return id;

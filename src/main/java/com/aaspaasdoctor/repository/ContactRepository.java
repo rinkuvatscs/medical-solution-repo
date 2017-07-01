@@ -1,11 +1,13 @@
 package com.aaspaasdoctor.repository;
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 
 import com.aaspaasdoctor.entity.Contact;
 
 public interface ContactRepository extends CrudRepository<Contact, Integer>{
 	
-	Contact findByEmail(String email); 
+	List<Contact> findByEmail(String email); 
 
 }
