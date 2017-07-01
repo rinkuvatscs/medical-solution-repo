@@ -25,7 +25,7 @@ public class Notification {
 	@Column(name = "notify_Message")
 	private String notification;
 
-	private int status;
+	private Integer status;
 
 	public int getId() {
 		return id;
@@ -59,11 +59,11 @@ public class Notification {
 		this.notification = notification;
 	}
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 

@@ -29,7 +29,9 @@ public class NotificationServiceImpl {
 
 		if (tempNotification != null && notification.getNotification() != null) {
 			tempNotification.setNotification(notification.getNotification());
-			tempNotification.setStatus(notification.getStatus());
+			if(tempNotification.getStatus() != null ){
+				tempNotification.setStatus(notification.getStatus());
+			}
 			return notificationRepository.save(tempNotification);
 		}
 		return new Notification();
