@@ -232,6 +232,7 @@ public class DoctorServiceImpl {
 
 	public Doctor doctorSignUp(Doctor doctor) {
 		Login login = new Login();
+		login.setEncode(true);
 		login.setPassword(doctor.getPassword());
 
 		doctor.setCreatedDate(Calendar.getInstance().getTime());
@@ -244,7 +245,6 @@ public class DoctorServiceImpl {
 
 		login.setType("d");
 		login.setTypeId(doctor.getdId());
-		login.setEncode(true);
 		loginServiceImpl.addLogin(login);
 
 		DoctorAddress doctorAddress = new DoctorAddress();
