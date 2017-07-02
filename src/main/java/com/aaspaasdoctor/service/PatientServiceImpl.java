@@ -79,7 +79,7 @@ public class PatientServiceImpl {
 		login.setEmail(patient.getEmail());
 		login.setMobile(patient.getMobile());
 		login.setPassword(patient.getPassword());
-		login.setType("d");
+		login.setType("p");
 		login.setTypeId(patient.getpId());
 		loginServiceImpl.addLogin(login);
 		
