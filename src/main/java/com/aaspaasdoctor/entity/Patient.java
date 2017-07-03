@@ -55,7 +55,7 @@ public class Patient {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "p_id")
 	private PatientAddress patientAddress;
-
+	
 	public Integer getpId() {
 		return pId;
 	}
