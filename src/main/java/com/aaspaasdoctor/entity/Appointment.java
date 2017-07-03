@@ -2,7 +2,6 @@ package com.aaspaasdoctor.entity;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,12 +13,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Table(name = "appointment")
 @Entity
 public class Appointment {
 
 	@Id
-	@Column(name = "appointment_Id")
+	@Column(name = "appointment_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer appointmentId;
 
@@ -29,22 +30,24 @@ public class Appointment {
 	@Column(name = "p_id")
 	private Integer pId;
 
-	@Column(name = "appointment_Date")
+	@Column(name = "appointment_date")
 	private Date appointmentDate;
 
-	@Column(name = "appointment_Desc")
+	@Column(name = "appointment_desc")
 	private String appointmentDesc;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "created_Date", columnDefinition = "DATETIME")
+	@Column(name = "created_date", columnDefinition = "DATETIME")
 	private Date createdDate;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "p_id")
+	@JsonBackReference
+	@OneToOne
+	@JoinColumn(name = "p_id", referencedColumnName = "p_id", insertable = false, updatable = false)
 	private Patient patient;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "d_id")
+	@JsonBackReference
+	@OneToOne
+	@JoinColumn(name = "d_id", referencedColumnName = "d_id", insertable = false, updatable = false)
 	private Doctor doctor;
 
 	public Integer getAppointmentId() {

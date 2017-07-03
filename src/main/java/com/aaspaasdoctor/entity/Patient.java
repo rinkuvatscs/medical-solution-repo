@@ -55,6 +55,17 @@ public class Patient {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "p_id")
 	private PatientAddress patientAddress;
+	
+	@OneToOne(mappedBy="patient")
+	private Appointment appointment;
+
+	public Appointment getAppointment() {
+		return appointment;
+	}
+
+	public void setAppointment(Appointment appointment) {
+		this.appointment = appointment;
+	}
 
 	public Integer getpId() {
 		return pId;

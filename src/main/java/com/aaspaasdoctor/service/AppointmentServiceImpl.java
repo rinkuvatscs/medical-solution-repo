@@ -17,6 +17,7 @@ public class AppointmentServiceImpl {
 	AppointmentRepository appointmentRepository;
 
 	public List<Appointment> findByPatientAndDoctorAndPId(int pid) {
-		return appointmentRepository.findByPId(pid);
+		//return appointmentRepository.findByPId(pid);
+		return appointmentRepository.findOne(pid);
 	}
 }
