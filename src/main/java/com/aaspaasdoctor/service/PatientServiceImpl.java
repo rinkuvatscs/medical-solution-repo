@@ -74,11 +74,12 @@ public class PatientServiceImpl {
 	public Patient patientSignUp(Patient patient) {
 		Patient tempPatient = patientRepository.save(patient);
 		Login login = new Login();
+		login.setEncode(true);
 		login.setAadhaar(patient.getAadhaar());
 		login.setEmail(patient.getEmail());
 		login.setMobile(patient.getMobile());
 		login.setPassword(patient.getPassword());
-		login.setType("d");
+		login.setType("p");
 		login.setTypeId(patient.getpId());
 		loginServiceImpl.addLogin(login);
 		
