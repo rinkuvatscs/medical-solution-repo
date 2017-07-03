@@ -2,6 +2,7 @@ package com.aaspaasdoctor.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,10 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Table(name = "appointment")
 @Entity
+@Table(name = "appointment")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Appointment {
 
 	@Id
@@ -40,15 +42,26 @@ public class Appointment {
 	@Column(name = "created_date", columnDefinition = "DATETIME")
 	private Date createdDate;
 
-	@JsonBackReference
-	@OneToOne
-	@JoinColumn(name = "p_id", referencedColumnName = "p_id", insertable = false, updatable = false)
+	
+	private String status;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	//@JoinColumn(name = "p_id", referencedColumnName = "p_id", insertable = false, updatable = false)
+	@JoinColumn( name = "p_id" , referencedColumnName = "p_id", insertable = false, updatable = false )
 	private Patient patient;
 
-	@JsonBackReference
-	@OneToOne
-	@JoinColumn(name = "d_id", referencedColumnName = "d_id", insertable = false, updatable = false)
+	@OneToOne(cascade = CascadeType.ALL)
+	//@JoinColumn(name = "d_id", referencedColumnName = "d_id", insertable = false, updatable = false)
+	@JoinColumn(name = "d_id" , referencedColumnName = "d_id", insertable = false, updatable = false)
 	private Doctor doctor;
+	
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	public Integer getAppointmentId() {
 		return appointmentId;

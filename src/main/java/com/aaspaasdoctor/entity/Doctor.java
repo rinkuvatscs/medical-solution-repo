@@ -83,18 +83,6 @@ public class Doctor  {
 	@Transient
 	private String password;
 
-	
-	@OneToOne(mappedBy="doctor")
-	private Appointment appointment;
-	
-	public Appointment getAppointment() {
-		return appointment;
-	}
-
-	public void setAppointment(Appointment appointment) {
-		this.appointment = appointment;
-	}
-
 	public String getPassword() {
 		return password;
 	}
