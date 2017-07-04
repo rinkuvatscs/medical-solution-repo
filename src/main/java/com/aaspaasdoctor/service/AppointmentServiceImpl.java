@@ -20,19 +20,16 @@ public class AppointmentServiceImpl {
 	AppointmentRepository appointmentRepository;
 
 	public Appointment findByAppointmentId(int appointmentId) {
-		return appointmentRepository.findByAppointmentIdAndStatus(
-				appointmentId, ACTIVE_STATUS);
+		return appointmentRepository.findByAppointmentIdAndStatus(appointmentId, ACTIVE_STATUS);
 
 	}
 
 	public List<Appointment> findByPatientId(Integer patientId) {
-		return appointmentRepository.findByPIdAndStatus(patientId,
-				ACTIVE_STATUS);
+		return appointmentRepository.findByPIdAndStatus(patientId, ACTIVE_STATUS);
 	}
 
 	public List<Appointment> findByDoctorId(Integer doctorId) {
-		return appointmentRepository
-				.findByDIdAndStatus(doctorId, ACTIVE_STATUS);
+		return appointmentRepository.findByDIdAndStatus(doctorId, ACTIVE_STATUS);
 	}
 
 	public Appointment cancelAppointment(Integer appointmentId) {
@@ -57,5 +54,10 @@ public class AppointmentServiceImpl {
 		}
 
 		return appointment;
+	}
+
+	public Appointment bookAppointment(Appointment appointment) {
+		appointment.setStatus(ACTIVE_STATUS);
+		return appointmentRepository.save(appointment);
 	}
 }

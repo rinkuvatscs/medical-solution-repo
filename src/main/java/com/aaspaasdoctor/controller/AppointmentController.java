@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,9 +23,13 @@ public class AppointmentController {
 	@Autowired
 	AppointmentServiceImpl appointmentServiceImpl;
 
+	@RequestMapping(method = RequestMethod.POST, value = "/appointment/make", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Appointment makeAppointment(@RequestBody Appointment appointment) {
+		return appointmentServiceImpl.bookAppointment(appointment);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/appointment/{appointmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Appointment findAppointmentByAppointmentId(
-			@PathVariable Integer appointmentId) {
+	public Appointment findAppointmentByAppointmentId(@PathVariable Integer appointmentId) {
 		return appointmentServiceImpl.findByAppointmentId(appointmentId);
 	}
 
