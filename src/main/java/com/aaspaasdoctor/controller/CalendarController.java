@@ -22,7 +22,6 @@ public class CalendarController {
 	@Autowired
 	private CalendarServiceImpl calendarServiceImpl;
 
-	// Add Calendar for both
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, value = "/calendar/add")
 	@ResponseBody
 	public Calendar addCalendarEvent(@RequestBody Calendar calendar) {
@@ -30,7 +29,6 @@ public class CalendarController {
 		return calendarServiceImpl.addCalendarEvent(calendar);
 	}
 
-	// Update Calendar for both
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, value = "/calendar/update")
 	@ResponseBody
 	public Calendar updateCalendar(@RequestBody Calendar calendar) {
@@ -38,14 +36,14 @@ public class CalendarController {
 		return calendarServiceImpl.updateCalendar(calendar);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/getpatientcalendar/{pId}/pId")
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/calendar/{pId}/patient")
 	@ResponseBody
 	public List<Calendar> getCalendarEventForPatient(@PathVariable Integer pId) {
 
 		return calendarServiceImpl.getCalendarEventByPatientId(pId);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/getdoctorcalendar/{dId}/dId")
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/calendar/{dId}/doctor")
 	@ResponseBody
 	public List<Calendar> getCalendarEventForDoctor(@PathVariable Integer dId) {
 
