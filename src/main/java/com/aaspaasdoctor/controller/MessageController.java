@@ -54,7 +54,7 @@ public class MessageController {
 	// To get only those messages whose status is '1' corresponds to doctorId.
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/message/doctor/{dId}/id/{status}/status")
 	@ResponseBody
-	public List<Message> getMessageforDoctorByDoctorIdAndStatus(@PathVariable int dId, @PathVariable int status) {
+	public List<Message> getMessageforDoctorByDoctorIdAndStatus(@PathVariable Integer dId, @PathVariable Integer status) {
 		return messageServiceImpl.findDoctorByDoctorIdAndStatus(dId, status);
 
 	}
