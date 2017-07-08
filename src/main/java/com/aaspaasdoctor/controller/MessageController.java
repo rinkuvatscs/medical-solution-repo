@@ -50,4 +50,20 @@ public class MessageController {
 	public Message deleteMessage(@PathVariable Integer messageId) {
 		return messageServiceImpl.deleteByMessageId(messageId);
 	}
+
+	// To get only those messages whose status is '1' corresponds to doctorId.
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/message/doctor/{dId}/id/{status}/status")
+	@ResponseBody
+	public List<Message> getMessageforDoctorByDoctorIdAndStatus(@PathVariable Integer dId, @PathVariable Integer status) {
+		return messageServiceImpl.findDoctorByDoctorIdAndStatus(dId, status);
+
+	}
+
+	// To get only those messages whose status is '1' corresponds to patientId.
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/get/message/patient/{pId}/id/{status}/status")
+	@ResponseBody
+	public List<Message> getMessageforPatientByPatientIdAndStatus(@PathVariable int pId, @PathVariable int status) {
+		return messageServiceImpl.findPatientByPatientIdAndStatus(pId, status);
+
+	}
 }

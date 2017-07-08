@@ -57,4 +57,13 @@ public class MessageServiceImpl {
 		}
 	}
 
+	public List<Message> findDoctorByDoctorIdAndStatus(Integer doctorId, Integer status) {
+		return messageRepository.findDoctorByDoctorIdAndStatus(doctorId, status);
+
+	}
+
+	public List<Message> findPatientByPatientIdAndStatus(Integer patientId, Integer status) {
+		return messageRepository.findPatientByPatientIdAndStatus(patientId, status);
+
+	}
 }

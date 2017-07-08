@@ -10,4 +10,8 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
 
 	java.util.List<Message> findByDoctorId(Integer doctorId);
 
+	java.util.List<Message> findDoctorByDoctorIdAndStatus(Integer doctorId, Integer status);
+
+	java.util.List<Message> findPatientByPatientIdAndStatus(Integer patientId, Integer status);
+
 }
